@@ -7,6 +7,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 
 from app.core.config import get_settings
 
@@ -21,7 +22,7 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Управление жизненным циклом: запуск и остановка."""
-    # Startup
+    # Startup (схема БД создаётся через Alembic: alembic upgrade head)
     logger.info("BookFinder API starting...")
     yield
     # Shutdown
@@ -56,6 +57,11 @@ def create_application() -> FastAPI:
     # app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
     # app.include_router(books.router, prefix="/api/v1/books", tags=["books"])
     # app.include_router(favorites.router, prefix="/api/v1/users", tags=["favorites"])
+
+    @app.get("/", include_in_schema=False)
+    async def root():
+        """Редирект на документацию."""
+        return RedirectResponse(url="/docs")
 
     @app.get("/health", tags=["health"])
     async def health_check():
