@@ -14,7 +14,7 @@ psycopg2-binary>=2.9.9  # для синхронных миграций Alembic (
 greenlet>=3.0.3
 
 # Validation & settings
-pydantic>=2.5.0
+pydantic[email]>=2.5.0
 pydantic-settings>=2.1.0
 
 # Auth
