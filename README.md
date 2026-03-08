@@ -82,10 +82,10 @@ docker compose up --build
 
 Если у вас старая версия Docker, используйте: `docker-compose up --build`.
 
-- Поднимается **PostgreSQL** (порт 5432) и **приложение** (порт 8000).
+- Поднимается **PostgreSQL** (порт 5432) и **приложение** (порт **8001** на хосте, чтобы не конфликтовать с локальным uvicorn на 8000).
 - При старте контейнера приложения автоматически выполняются миграции (`alembic upgrade head`), затем запускается uvicorn.
-- API: http://localhost:8000  
-- Swagger: http://localhost:8000/docs  
+- API: http://localhost:8001  
+- Swagger: http://localhost:8001/docs  
 
 Учётные данные БД по умолчанию: пользователь `bookfinder`, пароль `bookfinder`, база `bookfinder`. При необходимости задайте `SECRET_KEY` в `.env` или в переменных окружения перед запуском.
 
@@ -117,3 +117,4 @@ app/
 - **ModuleNotFoundError: psycopg2** — при использовании PostgreSQL для миграций нужен синхронный драйвер: `pip install psycopg2-binary`.
 - **В PowerShell «Амперсанд (&) не разрешен»** — в команде указан URL с `&`. Весь URL берите в **двойные кавычки**: `Invoke-RestMethod -Uri "http://localhost:8080/api/v1/books?q=python&page=1&limit=20"`.
 - **«Невозможно соединиться с удаленным сервером»** — сервер (uvicorn) не запущен. В отдельном терминале выполните `uvicorn app.main:app --reload --port 8080`, затем повторите запрос.
+- **Docker: «ports are not available» / «bind: Only one usage of each socket»** — порт 8000 занят (например, локальный uvicorn). В этом проекте приложение в Docker слушает порт **8001** (http://localhost:8001). Остановите процесс на 8000 или используйте 8001 для доступа к API в контейнере.
