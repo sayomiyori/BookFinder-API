@@ -1,9 +1,24 @@
-"""Pydantic-схемы для книг (поиск и ответ API)."""
+"""Pydantic-схемы для книг (поиск, создание и ответ API)."""
 
 from datetime import datetime
 from typing import Any
 
 from pydantic import BaseModel, Field
+
+
+class BookCreate(BaseModel):
+    """Тело запроса для ручного добавления книги."""
+
+    google_books_id: str = Field(..., min_length=1, max_length=64, description="Уникальный ID (например из Google Books или свой)")
+    title: str = Field(..., min_length=1, max_length=1024)
+    authors: list[str] | None = None
+    description: str | None = None
+    published_date: str | None = Field(None, max_length=32)
+    isbn: str | None = Field(None, max_length=32)
+    page_count: int | None = None
+    categories: list[str] | None = None
+    thumbnail: str | None = Field(None, max_length=2048)
+    language: str | None = Field(None, max_length=16)
 
 
 class BookResponse(BaseModel):

@@ -1,18 +1,19 @@
 """
-Эндпоинты книг: поиск (БД + Google Books API с кешированием).
+Эндпоинты книг: поиск, детализация, ручное добавление.
 """
 
 import datetime
-
-from fastapi import APIRouter, Depends, Query
-from sqlalchemy import func, or_, select
-from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Annotated
 
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy import func, or_, select
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.models.book import Book
-from app.schemas.book import BookResponse, BookSearchResult
+from app.schemas.book import BookCreate, BookResponse, BookSearchResult
 from app.services.google_books import fetch_books_from_google
-from app.utils.dependencies import get_db
+from app.utils.dependencies import get_current_user, get_db
+from app.models.user import User
 
 router = APIRouter()
 
@@ -93,3 +94,52 @@ async def search_books(
         page=page,
         limit=limit,
     )
+
+
+@router.get("/{book_id}", response_model=BookResponse)
+async def get_book(
+    book_id: int,
+    db: AsyncSession = Depends(get_db),
+) -> Book:
+    """Детальная информация о книге по id (из локальной БД)."""
+    result = await db.execute(select(Book).where(Book.id == book_id))
+    book = result.scalar_one_or_none()
+    if book is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Книга не найдена",
+        )
+    return book
+
+
+@router.post("", response_model=BookResponse, status_code=status.HTTP_201_CREATED)
+async def create_book(
+    data: BookCreate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> Book:
+    """
+    Ручное добавление книги. Требуется авторизация (JWT).
+    """
+    result = await db.execute(select(Book).where(Book.google_books_id == data.google_books_id))
+    if result.scalar_one_or_none() is not None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Книга с таким google_books_id уже существует",
+        )
+    book = Book(
+        google_books_id=data.google_books_id,
+        title=data.title,
+        authors=data.authors,
+        description=data.description,
+        published_date=data.published_date,
+        isbn=data.isbn,
+        page_count=data.page_count,
+        categories=data.categories,
+        thumbnail=data.thumbnail,
+        language=data.language,
+    )
+    db.add(book)
+    await db.flush()
+    await db.refresh(book)
+    return book
