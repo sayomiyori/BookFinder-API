@@ -56,6 +56,22 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 - Swagger UI: http://localhost:8000/docs  
 - Health: http://localhost:8000/health  
 
+### Примеры запросов из PowerShell
+
+**Сначала запустите сервер** в одном терминале: `uvicorn app.main:app --reload --port 8080`.  
+В другом терминале (или когда сервер уже работает) выполняйте запросы. В PowerShell URL с параметрами (`&`) передавайте в кавычках:
+
+```powershell
+# Поиск книг (порт 8080)
+Invoke-RestMethod -Uri "http://localhost:8080/api/v1/books?q=python&page=1&limit=20"
+
+# Health
+Invoke-RestMethod -Uri "http://localhost:8080/health"
+```
+
+Если видите «Невозможно соединиться с удаленным сервером» — сервер не запущен; запустите uvicorn и повторите запрос.  
+Через Swagger (http://localhost:8080/docs) можно вызывать эндпоинты из браузера.
+
 ## Структура проекта
 
 ```
@@ -79,3 +95,5 @@ app/
 - **GET / → 404** — по умолчанию корень `/` перенаправляет на `/docs`.
 - **UnicodeDecodeError** при `alembic upgrade head` или `alembic revision` — в `DATABASE_URL` (часто в пароле) есть символ не в UTF-8, или файл `.env` сохранён в другой кодировке (например Windows-1251). Решение: сохранить `.env` в кодировке **UTF-8** и использовать в пароле только латиницу/цифры, либо для разработки задать `DATABASE_URL=sqlite+aiosqlite:///./bookfinder.db`.
 - **ModuleNotFoundError: psycopg2** — при использовании PostgreSQL для миграций нужен синхронный драйвер: `pip install psycopg2-binary`.
+- **В PowerShell «Амперсанд (&) не разрешен»** — в команде указан URL с `&`. Весь URL берите в **двойные кавычки**: `Invoke-RestMethod -Uri "http://localhost:8080/api/v1/books?q=python&page=1&limit=20"`.
+- **«Невозможно соединиться с удаленным сервером»** — сервер (uvicorn) не запущен. В отдельном терминале выполните `uvicorn app.main:app --reload --port 8080`, затем повторите запрос.
