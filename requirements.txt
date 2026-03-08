@@ -1,0 +1,36 @@
+# BookFinder API — зависимости
+# Python 3.11+
+
+# Web framework
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+
+# Database
+sqlalchemy[asyncio]>=2.0.25
+alembic>=1.13.0
+asyncpg>=0.29.0
+aiosqlite>=0.19.0
+greenlet>=3.0.3
+
+# Validation & settings
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
+
+# Auth
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+
+# HTTP client (внешние API)
+httpx>=0.26.0
+
+# File upload & async files
+python-multipart>=0.0.6
+aiofiles>=23.2.1
+
+# Dev & testing
+pytest>=7.4.0
+pytest-asyncio>=0.23.0
+pytest-cov>=4.1.0
+
+# Optional: логирование (можно заменить на loguru позже)
+# loguru>=0.7.0
