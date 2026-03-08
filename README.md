@@ -34,7 +34,19 @@ copy .env.example .env
 # Отредактируйте .env: SECRET_KEY и при необходимости DATABASE_URL
 ```
 
-### 4. Запуск
+### 4. Миграции БД (Alembic)
+
+```bash
+# Применить миграции (создать таблицы)
+alembic upgrade head
+
+# Создать новую миграцию после изменения моделей
+alembic revision --autogenerate -m "описание"
+```
+
+Для PostgreSQL в `.env` нужен `DATABASE_URL=postgresql+asyncpg://...`. Для миграций установите `psycopg2-binary` и используйте sync-URL (Alembic подставит его сам из `database_url_sync`).
+
+### 5. Запуск
 
 ```bash
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
@@ -58,4 +70,12 @@ app/
 └── tests/            # тесты
 ```
 
-Дальнейшие шаги: настройка БД и моделей, аутентификация, эндпоинты книг и избранного.
+- **Шаг 2 (сделано):** БД и модели — SQLAlchemy async, модели User, Book, Favorite, Alembic, первая миграция.
+- Дальше: аутентификация (JWT), эндпоинты книг и избранного.
+
+## Возможные ошибки
+
+- **WinError 10013** при запуске uvicorn — порт занят или недоступен. Запустите на другом порту: `uvicorn app.main:app --reload --port 8080`.
+- **GET / → 404** — по умолчанию корень `/` перенаправляет на `/docs`.
+- **UnicodeDecodeError** при `alembic upgrade head` или `alembic revision` — в `DATABASE_URL` (часто в пароле) есть символ не в UTF-8, или файл `.env` сохранён в другой кодировке (например Windows-1251). Решение: сохранить `.env` в кодировке **UTF-8** и использовать в пароле только латиницу/цифры, либо для разработки задать `DATABASE_URL=sqlite+aiosqlite:///./bookfinder.db`.
+- **ModuleNotFoundError: psycopg2** — при использовании PostgreSQL для миграций нужен синхронный драйвер: `pip install psycopg2-binary`.

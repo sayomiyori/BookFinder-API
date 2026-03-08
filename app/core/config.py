@@ -31,6 +31,16 @@ class Settings(BaseSettings):
     # База данных
     database_url: str = "sqlite+aiosqlite:///./bookfinder.db"
 
+    @property
+    def database_url_sync(self) -> str:
+        """URL для синхронного подключения (Alembic)."""
+        url = self.database_url
+        if url.startswith("sqlite+aiosqlite"):
+            return url.replace("sqlite+aiosqlite", "sqlite", 1)
+        if "+asyncpg" in url:
+            return url.replace("+asyncpg", "", 1)
+        return url
+
     # Внешние API
     google_books_api_base: str = "https://www.googleapis.com/books/v1"
     google_vision_api_key: str | None = None
