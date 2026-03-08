@@ -53,10 +53,10 @@ def create_application() -> FastAPI:
     )
 
     # Роутеры
-    from app.api.v1 import auth, books
+    from app.api.v1 import auth, books, favorites
     app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
     app.include_router(books.router, prefix="/api/v1/books", tags=["books"])
-    # app.include_router(favorites.router, prefix="/api/v1/users", tags=["favorites"])
+    app.include_router(favorites.router, prefix="/api/v1/users", tags=["favorites"])
 
     @app.get("/", include_in_schema=False)
     async def root():
