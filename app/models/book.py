@@ -30,7 +30,7 @@ class Book(Base):
     language: Mapped[str | None] = mapped_column(String(16), nullable=True)
     created_at: Mapped[datetime.datetime] = mapped_column(
         DateTime(timezone=True),
-        default=datetime.datetime.utcnow,
+        default=lambda: datetime.datetime.now(datetime.timezone.utc),
         nullable=False,
     )
     last_accessed: Mapped[datetime.datetime | None] = mapped_column(
