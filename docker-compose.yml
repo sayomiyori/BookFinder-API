@@ -1,0 +1,38 @@
+# BookFinder API — запуск приложения и PostgreSQL для разработки/деплоя
+# Запуск: docker compose up --build  (или docker-compose up --build)
+# Остановка: docker compose down
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: bookfinder-db
+    environment:
+      POSTGRES_USER: bookfinder
+      POSTGRES_PASSWORD: bookfinder
+      POSTGRES_DB: bookfinder
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bookfinder -d bookfinder"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: bookfinder-api
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://bookfinder:bookfinder@db:5432/bookfinder
+      SECRET_KEY: ${SECRET_KEY:-change-me-in-production}
+      ACCESS_TOKEN_EXPIRE_MINUTES: 30
+      CORS_ORIGINS: http://localhost:3000,http://127.0.0.1:3000
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

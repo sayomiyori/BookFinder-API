@@ -72,6 +72,25 @@ Invoke-RestMethod -Uri "http://localhost:8080/health"
 Если видите «Невозможно соединиться с удаленным сервером» — сервер не запущен; запустите uvicorn и повторите запрос.  
 Через Swagger (http://localhost:8080/docs) можно вызывать эндпоинты из браузера.
 
+### Запуск через Docker (шаг 9)
+
+Нужны **Docker** и **Docker Compose** (в новых версиях Docker — встроенная команда `docker compose`). В корне проекта:
+
+```bash
+docker compose up --build
+```
+
+Если у вас старая версия Docker, используйте: `docker-compose up --build`.
+
+- Поднимается **PostgreSQL** (порт 5432) и **приложение** (порт 8000).
+- При старте контейнера приложения автоматически выполняются миграции (`alembic upgrade head`), затем запускается uvicorn.
+- API: http://localhost:8000  
+- Swagger: http://localhost:8000/docs  
+
+Учётные данные БД по умолчанию: пользователь `bookfinder`, пароль `bookfinder`, база `bookfinder`. При необходимости задайте `SECRET_KEY` в `.env` или в переменных окружения перед запуском.
+
+Остановка: `docker compose down` (или `docker-compose down`). Данные PostgreSQL сохраняются в volume `postgres_data`.
+
 ## Структура проекта
 
 ```
@@ -86,8 +105,9 @@ app/
 └── tests/            # тесты
 ```
 
-- **Шаг 2 (сделано):** БД и модели — SQLAlchemy async, модели User, Book, Favorite, Alembic, первая миграция.
-- Дальше: аутентификация (JWT), эндпоинты книг и избранного.
+- **Шаг 2–6:** БД, модели, аутентификация, книги, избранное.
+- **Шаг 8:** pytest, тесты auth/books/favorites/health.
+- **Шаг 9:** Dockerfile и docker-compose (app + PostgreSQL).
 
 ## Возможные ошибки
 

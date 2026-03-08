@@ -1,0 +1,29 @@
+# Git и виртуальное окружение
+.git
+.venv
+venv
+env
+
+# Локальные настройки и секреты
+.env
+.env.*
+!.env.example
+
+# Кэш и артефакты
+__pycache__
+*.py[cod]
+.pytest_cache
+.coverage
+htmlcov
+*.db
+*.sqlite
+
+# Документация и тесты (в образ не копируем для уменьшения размера; при необходимости раскомментировать)
+# app/tests
+# MANUAL_TEST.md
+# README.md
+
+# IDE и ОС
+.idea
+.vscode
+.DS_Store
