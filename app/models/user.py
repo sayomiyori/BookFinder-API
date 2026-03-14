@@ -1,11 +1,17 @@
 """Модель пользователя."""
 
+from __future__ import annotations
+
 import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Boolean, DateTime, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base
+
+if TYPE_CHECKING:
+    from app.models.favorite import Favorite
 
 
 class User(Base):
@@ -23,7 +29,7 @@ class User(Base):
         nullable=False,
     )
 
-    favorites: Mapped[list["Favorite"]] = relationship(
+    favorites: Mapped[list[Favorite]] = relationship(
         "Favorite",
         back_populates="user",
         cascade="all, delete-orphan",
