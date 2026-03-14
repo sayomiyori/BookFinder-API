@@ -26,7 +26,7 @@ jobs:
           --health-retries 5
 
     env:
-      DATABASE_URL: postgresql://test:test@localhost:5432/bookfinder_test
+      DATABASE_URL: postgresql+asyncpg://test:test@localhost:5432/bookfinder_test
       SECRET_KEY: test-secret-key-for-ci
 
     steps:
