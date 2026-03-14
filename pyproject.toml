@@ -1,0 +1,14 @@
+[project]
+name = "bookfinder-api"
+version = "0.1.0"
+description = "RESTful API для поиска книг с кешированием и избранным."
+requires-python = ">=3.11"
+dependencies = []
+
+[tool.ruff]
+ignore = ["F821", "E501"]
+exclude = ["alembic/"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["app/tests"]
