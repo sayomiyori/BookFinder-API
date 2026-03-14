@@ -1,11 +1,18 @@
 """Связь пользователь — избранная книга."""
 
+from __future__ import annotations
+
 import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base
+
+if TYPE_CHECKING:
+    from app.models.book import Book
+    from app.models.user import User
 
 
 class Favorite(Base):
@@ -23,5 +30,5 @@ class Favorite(Base):
         nullable=False,
     )
 
-    user: Mapped["User"] = relationship("User", back_populates="favorites")
-    book: Mapped["Book"] = relationship("Book", back_populates="favorites")
+    user: Mapped[User] = relationship("User", back_populates="favorites")
+    book: Mapped[Book] = relationship("Book", back_populates="favorites")
