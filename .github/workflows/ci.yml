@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: [main]
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true  #← добавить эту строку
-
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -33,9 +30,9 @@ jobs:
       SECRET_KEY: test-secret-key-for-ci
 
     steps:
-      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-python@v5.6.0
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.11"
           cache: "pip"
