@@ -6,6 +6,6 @@ scrape_configs:
   - job_name: bookfinder
     static_configs:
       - targets:
-          - host.docker.internal:8000  # Mac/Windows
-          # - 172.17.0.1:8000          # Linux — раскомментировать если нужно
+          - host.docker.internal:8001  # Mac/Windows (host port из docker-compose.yml)
+          # - 172.17.0.1:8001          # Linux — раскомментировать если нужно
     metrics_path: /metrics
