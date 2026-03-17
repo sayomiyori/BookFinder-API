@@ -1,0 +1,79 @@
+---
+description: Python code style and project conventions
+globs: **/*.py
+---
+
+# Stack
+
+- FastAPI for API layer, aiogram for Telegram bots
+- SQLAlchemy 2 (async) for DB, Alembic for migrations
+- Pydantic v2 for all data validation — never raw dicts in API handlers
+- pytest + pytest-cov for tests, coverage must not drop below 80%
+- ruff for linting — fix all warnings before committing
+
+# Code style
+
+- Always add type hints on all functions and class attributes
+- Use async/await consistently — never mix sync DB calls in async handlers
+- Prefer early returns over deeply nested if-blocks
+- Never use bare `except` — always catch specific exceptions (ValueError, HTTPException, etc.)
+- Never use `print()` for debugging — use `logging` module
+- Never hardcode secrets — all config via .env + pydantic-settings BaseSettings
+
+# Architecture
+
+- Split code into layers: routers → services → repositories → models
+- Routers only handle HTTP: parse input, call service, return response
+- Business logic lives in services, never in routers or models
+- Each module does one thing — if file exceeds 200 lines, split it
+
+# Naming
+
+- snake_case for functions and variables
+- PascalCase for classes and Pydantic models  
+- SCREAMING_SNAKE_CASE for constants
+- Prefix private methods and attributes with _
+- Test files: test_<module_name>.py
+
+# Git commits (Conventional Commits)
+
+- feat: add JWT refresh token rotation
+- fix: handle expired token in auth middleware
+- test: add coverage for book search endpoint
+- refactor: extract search logic to BookService
+- docs: update README with CI/CD section
+- chore: bump dependencies
+
+# Don't
+
+- Don't add TODO comments — implement fully or raise NotImplementedError with message
+- Don't write tests that mock everything — use real DB in tests (testcontainers or pytest fixtures)
+- Don't put business logic in Alembic migration files
+- Don't commit .env files — only .env.example with placeholder values
+```
+
+---
+
+## Что означает frontmatter вверху файла
+```
+---
+description: Python code style and project conventions
+globs: **/*.py
+---
+```
+
+`globs: **/*.py` — правило применяется только когда агент работает с `.py` файлами. Если попросишь написать YAML или Dockerfile — этот файл не загрузится, не засоряет контекст.
+
+`description` — Cursor читает это чтобы понять когда подключать правило. Пиши кратко и точно.
+
+---
+
+## Несколько rules-файлов — правильная структура
+
+Один большой файл хуже чем несколько маленьких. Cursor подгружает только нужные:
+```
+.cursor/rules/
+  python.mdc       ← применяется к *.py
+  docker.mdc       ← применяется к Dockerfile, docker-compose*
+  git.mdc          ← применяется всегда (commits, PR descriptions)
+  fastapi.mdc      ← применяется к app/routers/*.py, app/services/*.py
