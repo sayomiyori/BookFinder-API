@@ -32,8 +32,4 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/bookfinder-api:${{ github.sha }}
 
       - name: Deploy to Railway
-        run: |
-          npm install -g @railway/cli
-          railway up --service bookfinder-api
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: curl -X POST "${{ secrets.RAILWAY_DEPLOY_HOOK_URL }}"
