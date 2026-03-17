@@ -39,6 +39,8 @@ Every push triggers:
 3. **Coverage** — reported to Codecov
 4. On merge to `main`: Docker image → GHCR → Railway auto-deploy
 
+No manual deploys. Green badge = production is up to date.
+
 ## Local development
 
 \`\`\`bash
