@@ -30,6 +30,9 @@ jobs:
       # но переменная нужна для инициализации Settings
       DATABASE_URL: sqlite+aiosqlite:///./test.db
       SECRET_KEY: ${{ secrets.SECRET_KEY || 'ci-test-secret-key-not-for-production' }}
+      # Отключаем rate limiting в CI — тесты используют одно и то же IP (127.0.0.1)
+      # и многократно вызывают /register, что приводит к 429
+      RATE_LIMIT_ENABLED: "false"
 
     steps:
       - uses: actions/checkout@v4
