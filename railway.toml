@@ -1,0 +1,15 @@
+# Railway deployment configuration
+# https://docs.railway.app/reference/config-as-code
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "./Dockerfile"
+
+[deploy]
+# healthcheck — Railway ждёт 200 OK перед тем как объявить деплой успешным
+healthcheckPath = "/health"
+healthcheckTimeout = 300
+
+# Перезапуск при сбое (не при OOM)
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3

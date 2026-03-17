@@ -1,8 +1,13 @@
-# BookFinder API — запуск приложения и PostgreSQL для разработки/деплоя
-# Запуск: docker compose up --build  (или docker-compose up --build)
-# Остановка: docker compose down
+# BookFinder API — локальный стек для разработки и деплоя
+# Включает: PostgreSQL, Redis, FastAPI app, Celery worker + beat
+#
+# Запуск:       docker compose up --build
+# Остановка:    docker compose down
+# С очисткой:   docker compose down -v
 
 services:
+
+  # ── PostgreSQL ──────────────────────────────────────────────────────────────
   db:
     image: postgres:16-alpine
     container_name: bookfinder-db
@@ -20,6 +25,22 @@ services:
       timeout: 5s
       retries: 5
 
+  # ── Redis ───────────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: bookfinder-redis
+    command: redis-server --save 60 1 --loglevel warning
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # ── FastAPI приложение ───────────────────────────────────────────────────────
   app:
     build: .
     container_name: bookfinder-api
@@ -27,12 +48,51 @@ services:
       - "8001:8000"
     environment:
       DATABASE_URL: postgresql+asyncpg://bookfinder:bookfinder@db:5432/bookfinder
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
       SECRET_KEY: ${SECRET_KEY:-change-me-in-production}
       ACCESS_TOKEN_EXPIRE_MINUTES: 30
       CORS_ORIGINS: http://localhost:3000,http://127.0.0.1:3000
+      SENTRY_ENVIRONMENT: development
+      # SENTRY_DSN: — задайте в .env для включения мониторинга
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # ── Celery Worker ────────────────────────────────────────────────────────────
+  celery-worker:
+    build: .
+    container_name: bookfinder-celery-worker
+    command: celery -A app.worker worker --loglevel=info --concurrency=2
+    environment:
+      DATABASE_URL: postgresql+asyncpg://bookfinder:bookfinder@db:5432/bookfinder
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
+      SECRET_KEY: ${SECRET_KEY:-change-me-in-production}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # ── Celery Beat (планировщик) ────────────────────────────────────────────────
+  celery-beat:
+    build: .
+    container_name: bookfinder-celery-beat
+    command: celery -A app.worker beat --loglevel=info --scheduler celery.beat:PersistentScheduler
+    environment:
+      DATABASE_URL: postgresql+asyncpg://bookfinder:bookfinder@db:5432/bookfinder
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
+      SECRET_KEY: ${SECRET_KEY:-change-me-in-production}
+    depends_on:
+      - redis
 
 volumes:
   postgres_data:
+  redis_data:
