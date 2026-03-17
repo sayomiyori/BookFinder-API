@@ -34,6 +34,6 @@ jobs:
       - name: Deploy to Railway
         run: |
           npm install -g @railway/cli
-          railway up --service bookfinder-api
+          railway up --service bookfinder-api --project ${{ secrets.RAILWAY_PROJECT_ID }}
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
