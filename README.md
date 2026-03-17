@@ -24,8 +24,8 @@ FastAPI (Docker)
   ▼
 GitHub Actions CI/CD
   ├── ruff lint
-  ├── pytest + coverage (Codecov)
-  └── Docker → GHCR → Railway
+  ├── pytest (coverage 87%)
+  └── Docker → GHCR → Railway (prod)
   │
   ▼
 Prometheus + Grafana (observability)
