@@ -48,6 +48,7 @@ cp .env.example .env
 docker-compose up -d
 # API:     http://localhost:8000/docs
 # Metrics: http://localhost:8000/metrics
+# Grafana: http://localhost:3000
 \`\`\`
 
 
