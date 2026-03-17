@@ -10,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 
 from app.core.config import get_settings
+from app.metrics import setup_metrics
 
 # Настройка логирования
 logging.basicConfig(
@@ -42,6 +43,8 @@ def create_application() -> FastAPI:
         openapi_url="/openapi.json",
         lifespan=lifespan,
     )
+
+    setup_metrics(app)
 
     # CORS
     app.add_middleware(
