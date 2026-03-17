@@ -1,12 +1,17 @@
 """Модель книги (кеш из Google Books + ручное добавление)."""
 
+from __future__ import annotations
+
 import datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from sqlalchemy import DateTime, Integer, JSON, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base
+
+if TYPE_CHECKING:
+    from app.models.favorite import Favorite
 
 
 class Book(Base):
@@ -38,7 +43,7 @@ class Book(Base):
         nullable=True,
     )
 
-    favorites: Mapped[list["Favorite"]] = relationship(
+    favorites: Mapped[list[Favorite]] = relationship(
         "Favorite",
         back_populates="book",
         cascade="all, delete-orphan",

@@ -1,0 +1,21 @@
+---
+description: Docker and deployment conventions
+globs: Dockerfile, docker-compose*.yml
+---
+
+# Docker
+
+- Always use specific image tags, never :latest in production
+- Multi-stage builds for Python: builder stage + slim runtime
+- All secrets via environment variables, never baked into image
+- HEALTHCHECK обязателен для сервисов с базой данных
+- .dockerignore должен исключать: .env, __pycache__, .git, tests/
+```
+
+---
+
+## Как проверить что правило работает
+
+После создания файла попроси агента что-нибудь написать:
+```
+Напиши функцию которая достаёт книгу из базы по id

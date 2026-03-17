@@ -2,11 +2,9 @@
 Фикстуры для тестов: тестовая БД (SQLite in-memory), клиент, токен.
 """
 
-import asyncio
 from collections.abc import AsyncGenerator
 from typing import AsyncGenerator as TypingAsyncGenerator
 
-import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
