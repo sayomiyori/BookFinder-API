@@ -89,13 +89,4 @@ alembic/           # миграции
 
 ---
 
-<details>
-<summary>Для репозитория GitHub (About → Description и Topics)</summary>
 
-**Description:**
-```
-REST API для поиска книг: FastAPI, Google Books, избранное, JWT. SQLAlchemy 2, PostgreSQL, Docker.
-```
-
-**Topics:** `fastapi` `python` `rest-api` `jwt` `sqlalchemy` `postgresql` `docker` `google-books-api` `pydantic`
-</details>
