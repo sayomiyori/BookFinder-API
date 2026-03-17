@@ -1,92 +1,51 @@
 # BookFinder API
 
+![CI](https://github.com/sayomiyori/BookFinder-API/actions/workflows/ci.yml/badge.svg)
+![Coverage](https://codecov.io/gh/sayomiyori/BookFinder-API/graph/badge.svg)
+![Python](https://img.shields.io/badge/python-3.11-blue)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-green)
+![Docker](https://img.shields.io/badge/docker-ready-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+
+
 REST API для поиска книг: Google Books, избранное, JWT. FastAPI, SQLAlchemy 2, PostgreSQL/SQLite.
 
----
+## Architecture
 
-## Быстрый старт
+\`\`\`
+Client
+  │
+  ▼
+FastAPI (Docker)
+  ├── JWT Auth
+  ├── /api/v1/books  →  Google Books API
+  └── /api/v1/fav    →  PostgreSQL
+  │
+  ▼
+GitHub Actions CI/CD
+  ├── ruff lint
+  ├── pytest + coverage (Codecov)
+  └── Docker → GHCR → Railway
+  │
+  ▼
+Prometheus + Grafana (observability)
+\`\`\`
 
-```bash
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1   # Windows
-# source .venv/bin/activate    # Linux/macOS
+## CI/CD
 
-pip install -r requirements.txt
-cp .env.example .env           # заполнить SECRET_KEY и при необходимости DATABASE_URL
-alembic upgrade head
-uvicorn app.main:app --reload --port 8000
-```
+Every push triggers:
+1. **Lint** — ruff checks code style
+2. **Tests** — pytest with real PostgreSQL (not mocks)
+3. **Coverage** — reported to Codecov
+4. On merge to `main`: Docker image → GHCR → Railway auto-deploy
 
-**Документация:** http://localhost:8000/docs  
-**Проверка:** http://localhost:8000/health
+## Local development
 
----
-
-## Docker
-
-```bash
-docker compose up --build
-```
-
-API: http://localhost:8001/docs (порт 8001, чтобы не конфликтовать с локальным запуском).
-
----
-
-## API
-
-| Метод | Путь | Описание |
-|-------|------|----------|
-| GET | `/health` | Проверка доступности |
-| POST | `/api/v1/auth/register` | Регистрация → токен |
-| POST | `/api/v1/auth/login` | Вход → токен |
-| GET | `/api/v1/auth/me` | Текущий пользователь (Bearer) |
-| GET | `/api/v1/books?q=&page=1&limit=20` | Поиск книг |
-| GET | `/api/v1/books/{id}` | Книга по id |
-| POST | `/api/v1/books` | Добавить книгу (Bearer) |
-| GET | `/api/v1/users/me/favorites` | Избранное (Bearer) |
-| POST | `/api/v1/users/me/favorites/{book_id}` | В избранное |
-| DELETE | `/api/v1/users/me/favorites/{book_id}` | Удалить из избранного |
-
-Ручное тестирование: [MANUAL_TEST.md](MANUAL_TEST.md).
-
----
-
-## Тесты
-
-```bash
-pytest app/tests -v
-pytest app/tests -v --cov=app --cov-report=term-missing
-```
-
----
-
-## Структура
-
-```
-app/
-├── main.py
-├── core/          # config, database, security
-├── models/        # User, Book, Favorite
-├── schemas/       # Pydantic
-├── api/v1/        # auth, books, favorites
-├── services/      # google_books
-├── utils/         # get_db, get_current_user
-└── tests/
-alembic/           # миграции
-```
-
----
-
-## Настройка
-
-Переменные окружения задаются в `.env` (см. `.env.example`). Основные:
-
-- `SECRET_KEY` — для JWT (обязательно сменить в production).
-- `DATABASE_URL` — SQLite для разработки или PostgreSQL для production.
-- `CORS_ORIGINS` — разрешённые origins через запятую.
-
-Токены и пароли в репозиторий не коммитить; `.env` в `.gitignore`.
-
----
+\`\`\`bash
+cp .env.example .env
+docker-compose up -d
+# API:     http://localhost:8000/docs
+# Metrics: http://localhost:8000/metrics
+\`\`\`
 
 
