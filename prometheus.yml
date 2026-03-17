@@ -3,8 +3,9 @@ global:
   evaluation_interval: 15s
 
 scrape_configs:
-  - job_name: bookfinder-api
+  - job_name: bookfinder
     static_configs:
       - targets:
-          - host.docker.internal:8001  # API порт из docker-compose.yml
+          - host.docker.internal:8000  # Mac/Windows
+          # - 172.17.0.1:8000          # Linux — раскомментировать если нужно
     metrics_path: /metrics
